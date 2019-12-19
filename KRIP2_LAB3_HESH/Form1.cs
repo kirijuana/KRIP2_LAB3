@@ -25,7 +25,7 @@ namespace KRIP2_LAB3_HESH
         {
             int[] s = new int[64] { 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21 };
      
-            uint[] K = new uint[64] {
+            uint[] T = new uint[64] {
             0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
             0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,
             0x698098d8, 0x8b44f7af, 0xffff5bb1, 0x895cd7be,
@@ -64,45 +64,45 @@ namespace KRIP2_LAB3_HESH
             Array.Copy(length, 0, str_code_ascii, str_code_ascii.Length - 8, 4); // записываем длинну искомой последовательности вконец
 
             // ШАГ 3
-            uint a0 = 0x67452301;
-            uint b0 = 0xefcdab89;
-            uint c0 = 0x98badcfe;
-            uint d0 = 0x10325476;
-
+            uint a = 0x67452301;
+            uint b = 0xefcdab89;
+            uint c = 0x98badcfe;
+            uint d = 0x10325476;
+            // ШАГ 4
             for (int i = 0; i < str_code_ascii.Length / 64; ++i)
             {             
-                uint[] M = new uint[16];
+                uint[] X = new uint[16];
                 for (int j = 0; j < 16; ++j)
-                    M[j] = BitConverter.ToUInt32(str_code_ascii, (i * 64) + (j * 4)); // разбиваем на блоки по 32 бита
+                    X[j] = BitConverter.ToUInt32(str_code_ascii, (i * 64) + (j * 4)); // разбиваем на блоки по 32 бита
 
 
-                uint A = a0, B = b0, C = c0, D = d0, F = 0;
-                int g = 0;
+                uint A = a, B = b, C = c, D = d, F = 0;
+                int k = 0;
 
                 for (int j = 0; j < 64; ++j)
                 {
                     if (j <= 15)
                     {
                         F = (B & C) | (~B & D);
-                        g = j;
+                        k = j;
                     }
                     else if (j >= 16 && j <= 31)
                     {
                         F = (D & B) | (~D & C);
-                        g = ((5 * j) + 1) % 16;
+                        k = ((5 * j) + 1) % 16;
                     }
                     else if (j >= 32 && j <= 47)
                     {
                         F = B ^ C ^ D;
-                        g = ((3 * j) + 5) % 16;
+                        k = ((3 * j) + 5) % 16;
                     }
                     else if (j >= 48)
                     {
                         F = C ^ (B | ~D);
-                        g = (7 * j) % 16;
+                        k = (7 * j) % 16;
                     }
 
-                    F = F + A + K[j] + M[g];
+                    F = F + A + T[j] + X[k];
                     A = D;
                     D = C;
                     C = B;
@@ -110,13 +110,13 @@ namespace KRIP2_LAB3_HESH
                     
                 }
 
-                a0 += A;
-                b0 += B;
-                c0 += C;
-                d0 += D;
+                a += A;
+                b += B;
+                c += C;
+                d += D;
             }
             // шаг 5
-            textBox6.Text = String.Join("", BitConverter.GetBytes(a0).Select(y => y.ToString("x2"))) + String.Join("", BitConverter.GetBytes(b0).Select(y => y.ToString("x2"))) + String.Join("", BitConverter.GetBytes(c0).Select(y => y.ToString("x2"))) + String.Join("", BitConverter.GetBytes(d0).Select(y => y.ToString("x2")));
+            textBox6.Text = String.Join("", BitConverter.GetBytes(a).Select(y => y.ToString("x2"))) + String.Join("", BitConverter.GetBytes(b).Select(y => y.ToString("x2"))) + String.Join("", BitConverter.GetBytes(c).Select(y => y.ToString("x2"))) + String.Join("", BitConverter.GetBytes(d).Select(y => y.ToString("x2")));
         }
     }
 }
